@@ -1,5 +1,5 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
+AWSTemplateFormatVersion: '2025-03-16'  # Updated version date
+Transform: 'AWS::Serverless-2025-03-16'  # Updated transform version date
 
 Resources:
 
@@ -35,50 +35,50 @@ Resources:
         Variables:
           TABLE_NAME: !Ref OnboardingTable
 
-#   # API Gateway to trigger the Lambda function
-#   OnboardingApi:
-#     Type: AWS::Serverless::Api
-#     Properties:
-#       Name: OnboardingApi
-#       StageName: prod
-#       DefinitionBody:
-#         openapi: 3.0.1
-#         info:
-#           title: Onboarding API
-#           version: '1.0'
-#         paths:
-#           /onboard:
-#             post:
-#               operationId: onboardClient
-#               parameters:
-#                 - name: clientDetails
-#                   in: body
-#                   description: New client details
-#                   required: true
-#               responses:
-#                 200:
-#                   description: Client onboarded successfully
-#                 400:
-#                   description: Bad request
+  # API Gateway to trigger the Lambda function
+  OnboardingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: OnboardingApi
+      StageName: prod
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: Onboarding API
+          version: '1.0'
+        paths:
+          /onboard:
+            post:
+              operationId: onboardClient
+              parameters:
+                - name: clientDetails
+                  in: body
+                  description: New client details
+                  required: true
+              responses:
+                200:
+                  description: Client onboarded successfully
+                400:
+                  description: Bad request
 
-#   # Cognito User Pool (Optional)
-#   UserPool:
-#     Type: AWS::Cognito::UserPool
-#     Properties:
-#       UserPoolName: OnboardingUserPool
-#       MfaConfiguration: OFF
-#       AutoVerifiedAttributes:
-#         - email
-#       AliasAttributes:
-#         - email
+  # User Pool (Optional)
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: OnboardingUserPool
+      MfaConfiguration: OFF
+      AutoVerifiedAttributes:
+        - email
+      AliasAttributes:
+        - email
 
-# Outputs:
-#   OnboardingApiUrl:
-#     Description: "API Gateway URL"
-#     Value: !Sub "https://${OnboardingApi}.execute-api.${AWS::Region}.amazonaws.com/prod/onboard"
-#   DynamoDbTable:
-#     Description: "DynamoDB Table Name"
-#     Value: !Ref OnboardingTable
-#   CognitoUserPoolId:
-#     Description: "Cognito User Pool ID"
-#     Value: !Ref UserPool
+Outputs:
+  OnboardingApiUrl:
+    Description: "API Gateway URL"
+    Value: !Sub "https://${OnboardingApi}.execute-api.${AWS::Region}.amazonaws.com/prod/onboard"
+  DynamoDbTable:
+    Description: "DynamoDB Table Name"
+    Value: !Ref OnboardingTable
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref UserPool
