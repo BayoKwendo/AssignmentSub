@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+
+  # DynamoDB table for multi-tenant use
+  OnboardingTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: OnboardingTable
+      AttributeDefinitions:
+        - AttributeName: TenantID
+          AttributeType: S
+        - AttributeName: ClientID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: TenantID
+          KeyType: HASH  # Partition key
+        - AttributeName: ClientID
+          KeyType: RANGE  # Sort key
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  # Lambda function to handle onboarding logic
+  OnboardingLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: onboarding.lambda_handler
+      Runtime: python3.8
+      CodeUri: onboarding/
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref OnboardingTable
+
+#   # API Gateway to trigger the Lambda function
+#   OnboardingApi:
+#     Type: AWS::Serverless::Api
+#     Properties:
+#       Name: OnboardingApi
+#       StageName: prod
+#       DefinitionBody:
+#         openapi: 3.0.1
+#         info:
+#           title: Onboarding API
+#           version: '1.0'
+#         paths:
+#           /onboard:
+#             post:
+#               operationId: onboardClient
+#               parameters:
+#                 - name: clientDetails
+#                   in: body
+#                   description: New client details
+#                   required: true
+#               responses:
+#                 200:
+#                   description: Client onboarded successfully
+#                 400:
+#                   description: Bad request
+
+#   # Cognito User Pool (Optional)
+#   UserPool:
+#     Type: AWS::Cognito::UserPool
+#     Properties:
+#       UserPoolName: OnboardingUserPool
+#       MfaConfiguration: OFF
+#       AutoVerifiedAttributes:
+#         - email
+#       AliasAttributes:
+#         - email
+
+# Outputs:
+#   OnboardingApiUrl:
+#     Description: "API Gateway URL"
+#     Value: !Sub "https://${OnboardingApi}.execute-api.${AWS::Region}.amazonaws.com/prod/onboard"
+#   DynamoDbTable:
+#     Description: "DynamoDB Table Name"
+#     Value: !Ref OnboardingTable
+#   CognitoUserPoolId:
+#     Description: "Cognito User Pool ID"
+#     Value: !Ref UserPool
